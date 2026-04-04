@@ -7,7 +7,7 @@ from typing import Optional
 from app.core.database import get_db
 from app.models.record import FinancialRecord
 from app.models.user import User
-from app.schemas.record import RecordCreate, RecordUpdate, RecordResponse, PaginatedRecords
+from app.schemas.record import RecordCreate, RecordUpdate, RecordResponse, PaginatedRecords, RecordTypeEnum
 from app.dependencies.rbac import require_role
 from app.dependencies.auth import get_current_active_user
 from app.services.record_service import get_records
@@ -38,7 +38,7 @@ def create_record(
 
 @router.get("/", response_model=PaginatedRecords)
 def list_records(
-    type: Optional[str] = Query(None, description="Filter by type: income or expense"),
+    type: Optional[RecordTypeEnum] = Query(None, description="Filter by type: income or expense"),
     category: Optional[str] = Query(None, description="Filter by category"),
     date_from: Optional[date] = Query(None, description="Start date filter"),
     date_to: Optional[date] = Query(None, description="End date filter"),
@@ -49,7 +49,7 @@ def list_records(
 ):
     """List financial records with filtering and pagination. All roles."""
     records, total = get_records(
-        db, record_type=type, category=category,
+        db, record_type=type.value if type else None, category=category,
         date_from=date_from, date_to=date_to,
         page=page, limit=limit,
     )

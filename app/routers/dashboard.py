@@ -30,8 +30,9 @@ def dashboard_categories(
 @router.get("/trends", response_model=DashboardTrends)
 def dashboard_trends(
     period: str = Query("monthly", pattern="^(weekly|monthly)$", description="Trend period: weekly or monthly"),
+    limit: int = Query(6, ge=1, le=24),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
     """Get income/expense trends over the last 6 periods. All roles."""
-    return DashboardTrends(trends=get_trends(db, period))
+    return DashboardTrends(trends=get_trends(db, period, limit))

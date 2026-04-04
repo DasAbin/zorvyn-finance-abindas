@@ -4,6 +4,7 @@ from pydantic import BaseModel, field_validator
 from datetime import date, datetime
 from typing import Optional, List
 from enum import Enum
+from decimal import Decimal
 
 
 class RecordTypeEnum(str, Enum):
@@ -12,7 +13,7 @@ class RecordTypeEnum(str, Enum):
 
 
 class RecordCreate(BaseModel):
-    amount: float
+    amount: Decimal
     type: RecordTypeEnum
     category: str
     date: date
@@ -20,23 +21,30 @@ class RecordCreate(BaseModel):
 
     @field_validator("amount")
     @classmethod
-    def amount_must_be_positive(cls, value: float) -> float:
-        if value <= 0:
+    def amount_must_be_positive(cls, value):
+        if value is not None and value <= 0:
             raise ValueError("Amount must be greater than zero")
         return value
 
 
 class RecordUpdate(BaseModel):
-    amount: Optional[float] = None
+    amount: Optional[Decimal] = None
     type: Optional[RecordTypeEnum] = None
     category: Optional[str] = None
     date: Optional[date] = None
     notes: Optional[str] = None
 
+    @field_validator("amount")
+    @classmethod
+    def amount_must_be_positive(cls, value):
+        if value is not None and value <= 0:
+            raise ValueError("Amount must be greater than zero")
+        return value
+
 
 class RecordResponse(BaseModel):
     id: int
-    amount: float
+    amount: Decimal
     type: str
     category: str
     date: date

@@ -1,22 +1,22 @@
 from pydantic import BaseModel
-
+from decimal import Decimal
 
 class SummaryResponse(BaseModel):
-    total_income: float
-    total_expenses: float
-    net_balance: float
+    total_income: Decimal
+    total_expenses: Decimal
+    net_balance: Decimal
     record_count: int
 
 
 class CategoryTotal(BaseModel):
     category: str
-    total: float
+    total: Decimal
 
 
 class TrendPoint(BaseModel):
     period: str
-    income: float
-    expense: float
+    income: Decimal
+    expense: Decimal
 
 
 class DashboardTrends(BaseModel):

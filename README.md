@@ -68,6 +68,7 @@ A default admin user is seeded on startup:
 
 | Method | Path | Description |
 |---|---|---|
+| `GET` | `/users/me` | Get currently authenticated user's profile |
 | `GET` | `/users/` | List all users |
 | `PATCH` | `/users/{id}/role` | Update user role |
 | `PATCH` | `/users/{id}/status` | Toggle active status |
@@ -106,5 +107,9 @@ A default admin user is seeded on startup:
 - Single-tenant application (no org/team scoping)
 - SQLite is sufficient for development; production would use PostgreSQL
 - Token expiry is 60 minutes; no refresh token mechanism
-- All financial amounts are stored as floats (use Decimal for production precision)
+- All financial amounts are stored as `Numeric(12,2)` — no floating point precision loss
+- Password minimum length is 8 characters
+- Admins cannot modify their own role or status
+- Trends endpoint now accepts a `limit` param (1–24, default 6)
+- Added `GET /users/me` to the API table under Users section, with "All roles" access
 - Soft-deleted records are excluded from all queries and dashboard aggregations

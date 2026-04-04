@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date
 from typing import Optional
+from decimal import Decimal
 from app.models.record import FinancialRecord
 from app.schemas.dashboard import SummaryResponse, CategoryTotal, TrendPoint
 
@@ -49,9 +50,9 @@ def get_summary(db: Session) -> SummaryResponse:
     record_count = base.count()
 
     return SummaryResponse(
-        total_income=float(total_income),
-        total_expenses=float(total_expenses),
-        net_balance=float(total_income) - float(total_expenses),
+        total_income=Decimal(str(total_income)),
+        total_expenses=Decimal(str(total_expenses)),
+        net_balance=Decimal(str(total_income)) - Decimal(str(total_expenses)),
         record_count=record_count,
     )
 
@@ -66,10 +67,10 @@ def get_category_totals(db: Session) -> list[CategoryTotal]:
         .group_by(FinancialRecord.category)
         .all()
     )
-    return [CategoryTotal(category=r.category, total=float(r.total)) for r in results]
+    return [CategoryTotal(category=r.category, total=Decimal(str(r.total))) for r in results]
 
 
-def get_trends(db: Session, period: str = "monthly") -> list[TrendPoint]:
+def get_trends(db: Session, period: str = "monthly", limit: int = 6) -> list[TrendPoint]:
     if period == "weekly":
         period_expr = func.strftime("%Y-%W", FinancialRecord.date)
     else:
@@ -94,12 +95,12 @@ def get_trends(db: Session, period: str = "monthly") -> list[TrendPoint]:
         .filter(FinancialRecord.is_deleted == False)
         .group_by("period")
         .order_by(period_expr.desc())
-        .limit(6)
+        .limit(limit)
         .all()
     )
 
     trends = [
-        TrendPoint(period=r.period, income=float(r.income), expense=float(r.expense))
+        TrendPoint(period=r.period, income=Decimal(str(r.income)), expense=Decimal(str(r.expense)))
         for r in results
     ]
     trends.reverse()

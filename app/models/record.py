@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, Boolean, Date, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Numeric, String, Boolean, Date, DateTime, ForeignKey
 from datetime import datetime, timezone
 from app.core.database import Base
 
@@ -7,7 +7,7 @@ class FinancialRecord(Base):
     __tablename__ = "financial_records"
 
     id = Column(Integer, primary_key=True, index=True)
-    amount = Column(Float, nullable=False)
+    amount = Column(Numeric(precision=12, scale=2), nullable=False)
     type = Column(String, nullable=False)  # income, expense
     category = Column(String, nullable=False)
     date = Column(Date, nullable=False)
