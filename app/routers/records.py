@@ -7,7 +7,7 @@ from typing import Optional
 from app.core.database import get_db
 from app.models.record import FinancialRecord
 from app.models.user import User
-from app.schemas.record import RecordCreate, RecordUpdate, RecordResponse
+from app.schemas.record import RecordCreate, RecordUpdate, RecordResponse, PaginatedRecords
 from app.dependencies.rbac import require_role
 from app.dependencies.auth import get_current_active_user
 from app.services.record_service import get_records
@@ -36,7 +36,7 @@ def create_record(
     return record
 
 
-@router.get("/", response_model=list[RecordResponse])
+@router.get("/", response_model=PaginatedRecords)
 def list_records(
     type: Optional[str] = Query(None, description="Filter by type: income or expense"),
     category: Optional[str] = Query(None, description="Filter by category"),
@@ -53,7 +53,7 @@ def list_records(
         date_from=date_from, date_to=date_to,
         page=page, limit=limit,
     )
-    return records
+    return {"data": records, "total": total, "page": page, "limit": limit}
 
 
 @router.get("/{record_id}", response_model=RecordResponse)

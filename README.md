@@ -99,6 +99,7 @@ A default admin user is seeded on startup:
 - **JWT Stateless Auth**: No server-side session storage needed, scales cleanly across instances
 - **SQLite**: Zero-infrastructure local development; swap to PostgreSQL by changing the database URL
 - **HTTPBearer Security**: All protected endpoints show lock icons in Swagger UI
+- **CORS**: `allow_origins=["*"]` is intentionally set for local development only and must be restricted to specific trusted origins in production
 
 ## Assumptions
 
