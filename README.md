@@ -10,7 +10,7 @@ A **Finance Data Processing and Access Control Backend** built with FastAPI, SQL
 | **SQLAlchemy** | ORM for database models and DB-level aggregation queries |
 | **SQLite** | Zero-config local database (swap to PostgreSQL in prod via `DATABASE_URL`) |
 | **JWT (python-jose)** | Stateless authentication — no session storage, scales horizontally |
-| **Passlib + bcrypt** | Industry-standard password hashing |
+| **bcrypt** | Industry-standard password hashing |
 | **Pydantic v2** | Request/response validation with type safety |
 
 ## Setup
@@ -64,11 +64,16 @@ A default admin user is seeded on startup:
 | `POST` | `/auth/register` | Register a new user |
 | `POST` | `/auth/login` | Login and get JWT token |
 
-### Users (Admin Only)
+### Current User (All Roles)
 
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/users/me` | Get currently authenticated user's profile |
+
+### Users (Admin Only)
+
+| Method | Path | Description |
+|---|---|---|
 | `GET` | `/users/` | List all users |
 | `PATCH` | `/users/{id}/role` | Update user role |
 | `PATCH` | `/users/{id}/status` | Toggle active status |
@@ -113,3 +118,36 @@ A default admin user is seeded on startup:
 - Trends endpoint now accepts a `limit` param (1–24, default 6)
 - Added `GET /users/me` to the API table under Users section, with "All roles" access
 - Soft-deleted records are excluded from all queries and dashboard aggregations
+
+## Deployment
+
+### Render (recommended)
+
+The repo includes a `render.yaml` blueprint — connect your GitHub repo on [Render](https://render.com) and it deploys automatically.
+
+### Docker
+
+```bash
+docker build -t zorvyn-finance .
+docker run -p 8000:8000 zorvyn-finance
+```
+
+## Quick Test
+
+```bash
+BASE=http://localhost:8000
+
+# Login as admin
+TOKEN=$(curl -s -X POST $BASE/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@zorvyn.com","password":"admin123"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
+
+# Create a record
+curl -s -X POST $BASE/records/ \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"amount":5000,"type":"income","category":"Salary","date":"2026-04-01"}'
+
+# View dashboard
+curl -s $BASE/dashboard/summary -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+```
