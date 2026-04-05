@@ -70,7 +70,8 @@ def get_category_totals(db: Session) -> list[CategoryTotal]:
     return [CategoryTotal(category=r.category, total=Decimal(str(r.total))) for r in results]
 
 
-def get_trends(db: Session, period: str = "monthly", limit: int = 6) -> list[TrendPoint]:
+def get_trends(db: Session, period: str = "monthly") -> list[TrendPoint]:
+    limit = 6
     if period == "weekly":
         period_expr = func.strftime("%Y-%W", FinancialRecord.date)
     else:
