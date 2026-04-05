@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, case
 from datetime import date
 from typing import Optional
 from decimal import Decimal
@@ -81,13 +81,13 @@ def get_trends(db: Session, period: str = "monthly") -> list[TrendPoint]:
         db.query(
             period_expr.label("period"),
             func.sum(
-                func.case(
+                case(
                     (FinancialRecord.type == "income", FinancialRecord.amount),
                     else_=0,
                 )
             ).label("income"),
             func.sum(
-                func.case(
+                case(
                     (FinancialRecord.type == "expense", FinancialRecord.amount),
                     else_=0,
                 )
