@@ -7,7 +7,7 @@ class FinancialRecord(Base):
     __tablename__ = "financial_records"
 
     id = Column(Integer, primary_key=True, index=True)
-    amount = Column(Numeric(precision=12, scale=2), nullable=False)
+    amount = Column(Numeric(precision=15, scale=2), nullable=False)
     type = Column(String, nullable=False)  # income, expense
     category = Column(String, nullable=False)
     date = Column(Date, nullable=False)
